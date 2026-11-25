@@ -1,0 +1,97 @@
+import type { ReactNode } from 'react'
+import { motion } from 'motion/react'
+import { ArrowRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { onLinkClick } from '@/lib/router'
+
+export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <p className={cn('flex items-center gap-2 text-sm uppercase tracking-tight', className)}>
+      <span className="size-3.5 bg-brand" aria-hidden />
+      {children}
+    </p>
+  )
+}
+
+/** Fades + lifts content in when it scrolls into view. */
+export function Reveal({
+  children,
+  delay = 0,
+  y = 24,
+  className,
+}: {
+  children: ReactNode
+  delay?: number
+  y?: number
+  className?: string
+}) {
+  return (
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, y, filter: 'blur(6px)' }}
+      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
+export function Logo({ className }: { className?: string }) {
+  return (
+    <a href="/" onClick={onLinkClick} className={cn('flex items-center gap-2 text-white', className)}>
+      <span className="text-[13px] leading-tight font-medium">
+        SMITH RETAIL
+        <br />
+        VENTURES
+      </span>
+      <LogoMark className="h-8 w-12 text-brand-light" />
+    </a>
+  )
+}
+
+export function LogoMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 48 32" fill="none" className={className} aria-hidden>
+      <path d="M14 3h31l-9 10H12z" stroke="currentColor" strokeWidth="4" strokeLinejoin="round" />
+      <path d="M34 29H3l9-10h24z" stroke="currentColor" strokeWidth="4" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+export function ArrowButton({
+  children,
+  variant = 'dark',
+  href = '#contact',
+  className,
+}: {
+  children: ReactNode
+  variant?: 'dark' | 'light'
+  href?: string
+  className?: string
+}) {
+  return (
+    <motion.a
+      href={href}
+      onClick={onLinkClick}
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.97 }}
+      className={cn(
+        'group inline-flex items-center gap-2.5 rounded-sm px-3.5 py-2.5 text-sm shadow-sm',
+        variant === 'dark' ? 'bg-ink text-white' : 'bg-white text-ink',
+        className,
+      )}
+    >
+      {children}
+      <span
+        className={cn(
+          'grid size-4 place-items-center rounded-full transition-transform group-hover:translate-x-0.5',
+          variant === 'dark' ? 'bg-white text-ink' : 'bg-ink text-white',
+        )}
+      >
+        <ArrowRight className="size-3" strokeWidth={2.5} />
+      </span>
+    </motion.a>
+  )
+}
