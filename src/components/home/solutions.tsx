@@ -79,7 +79,7 @@ function Ecosystem() {
         transition={{ duration: 2, repeat: Infinity }}
       >
         <span className="grid size-14 place-items-center rounded-full bg-white sm:size-[70px]">
-          <LogoMark className="h-6 w-9 text-brand sm:h-8 sm:w-12" />
+          <LogoMark className="h-6 w-9 sm:h-8 sm:w-12" />
         </span>
       </motion.div>
 

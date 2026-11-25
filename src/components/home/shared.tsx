@@ -46,17 +46,21 @@ export function Logo({ className }: { className?: string }) {
         <br />
         VENTURES
       </span>
-      <LogoMark className="h-8 w-12 text-brand-light" />
+      <LogoMark className="h-[34px] w-[49px]" />
     </a>
   )
 }
 
+/** Brand mark from Figma (49×34, with @2x for retina). Size it with h-/w- classes. */
 export function LogoMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 48 32" fill="none" className={className} aria-hidden>
-      <path d="M14 3h31l-9 10H12z" stroke="currentColor" strokeWidth="4" strokeLinejoin="round" />
-      <path d="M34 29H3l9-10h24z" stroke="currentColor" strokeWidth="4" strokeLinejoin="round" />
-    </svg>
+    <img
+      src="/logo.png"
+      srcSet="/logo.png 1x, /logo@2x.png 2x"
+      alt=""
+      aria-hidden
+      className={cn('object-contain', className)}
+    />
   )
 }
 
