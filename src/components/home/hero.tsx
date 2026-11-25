@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { AnimatePresence, motion, useScroll, useTransform } from 'motion/react'
+import { useRef, useState } from 'react'
+import { AnimatePresence, motion, useInView, useScroll, useTransform } from 'motion/react'
 import { ArrowDown, ArrowUpRight, Menu, X } from 'lucide-react'
 import { Logo } from './shared'
 import { navLinks, partners } from './data'
@@ -27,8 +27,12 @@ const lines = Array.from({ length: 46 }, (_, i) => ({
 }))
 
 export function WaveBackground() {
+  const ref = useRef<SVGSVGElement>(null)
+  const visible = useInView(ref, { margin: '100px' })
   return (
     <svg
+      ref={ref}
+      data-paused={!visible || undefined}
       className="pointer-events-none absolute inset-0 h-full w-full"
       viewBox={`0 0 ${WIDTH} 900`}
       preserveAspectRatio="xMidYMid slice"
@@ -36,16 +40,19 @@ export function WaveBackground() {
     >
       <g style={{ transform: 'skewY(-6deg)', transformOrigin: 'center' }}>
         {lines.map((l, i) => (
-          <motion.path
+          // CSS keyframes instead of per-frame JS: 46 lines animate without touching the main thread
+          <path
             key={i}
             d={wavePath(l.y, l.amp)}
             fill="none"
             stroke={l.color}
             strokeOpacity={l.opacity}
             strokeWidth={1}
-            initial={{ x: l.reverse ? -PERIOD : 0 }}
-            animate={{ x: l.reverse ? 0 : -PERIOD }}
-            transition={{ duration: l.duration, repeat: Infinity, ease: 'linear' }}
+            className="wave-line"
+            style={{
+              animationDuration: `${l.duration}s`,
+              animationDirection: l.reverse ? 'reverse' : 'normal',
+            }}
           />
         ))}
       </g>

@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { motion, useScroll, useSpring, useTransform, type MotionValue } from 'motion/react'
+import { motion, useScroll, useTransform, type MotionValue } from 'motion/react'
 import { ArrowUpRight } from 'lucide-react'
 import { ArrowButton, Eyebrow, Reveal } from '@/components/home/shared'
 import { cn } from '@/lib/utils'
@@ -99,8 +99,8 @@ function PinnedStaircase({ c }: { c: StaircaseConfig }) {
   const stage = useRef<HTMLDivElement>(null)
   const [travel, setTravel] = useState(0)
 
-  const { scrollYProgress } = useScroll({ target: section, offset: ['start start', 'end end'] })
-  const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 26, mass: 0.4 })
+  // Lenis already eases the scroll itself, so the scroll position drives the cards directly.
+  const { scrollYProgress: progress } = useScroll({ target: section, offset: ['start start', 'end end'] })
 
   // How far the staircase must move up so the last card ends fully in view.
   useLayoutEffect(() => {
@@ -163,13 +163,15 @@ function PinnedStaircase({ c }: { c: StaircaseConfig }) {
 
 function RisingCard({ c, index, n, progress }: { c: StaircaseConfig; index: number; n: number; progress: MotionValue<number> }) {
   // Card 0 is in place from the start; the others rise in evenly over the scroll.
-  const start = index === 0 ? -0.2 : 0.05 + ((index - 1) / (n - 1)) * 0.8
-  const end = start + 0.22
-  const y = useTransform(progress, [start, end], [260, 0])
-  const opacity = useTransform(progress, [start, start + 0.12], [0, 1])
-  const scale = useTransform(progress, [start, end], [0.92, 1])
+  // Ranges must stay inside 0–1 and increase, or the browser rejects the animation.
+  const first = index === 0
+  const start = first ? 0 : 0.05 + ((index - 1) / (n - 1)) * 0.8
+  const end = Math.min(1, start + 0.22)
+  const y = useTransform(progress, [start, end], first ? [0, 0] : [260, 0])
+  const opacity = useTransform(progress, [start, start + 0.12], first ? [1, 1] : [0, 1])
+  const scale = useTransform(progress, [start, end], first ? [1, 1] : [0.92, 1])
   // Bars fill while the card arrives, so the newest step reads as "current".
-  const lit = useTransform(progress, [start + 0.05, end], [0, 1])
+  const lit = useTransform(progress, first ? [0, 0.15] : [start + 0.05, end], [0, 1])
 
   return (
     <motion.div

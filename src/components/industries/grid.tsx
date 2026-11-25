@@ -117,10 +117,10 @@ export function IndustryGrid() {
               />
 
               <div className="relative flex items-start justify-between gap-4 px-5 pt-5">
-                <h3 className={cn('font-light tracking-tight transition-all duration-500', on ? 'text-2xl' : 'max-w-[160px] text-2xl')}>
+                <h3 className={cn('text-2xl font-light tracking-tight', !on && 'max-w-[160px]')}>
                   {c.title}
                 </h3>
-                <span className={cn('text-lg font-light transition-all duration-500', !on && 'mt-4')}>
+                <span className={cn('text-lg font-light transition-transform duration-500 ease-out', !on && 'translate-y-4')}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
               </div>

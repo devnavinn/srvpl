@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { scrollToTarget } from './smooth-scroll'
 
 const subscribe = (cb: () => void) => {
   window.addEventListener('popstate', cb)
@@ -16,9 +17,12 @@ export function navigate(href: string) {
   window.history.pushState({}, '', url)
   window.dispatchEvent(new PopStateEvent('popstate'))
   if (url.hash) {
-    requestAnimationFrame(() => document.querySelector(url.hash)?.scrollIntoView({ behavior: 'smooth' }))
+    requestAnimationFrame(() => {
+      const el = document.querySelector(url.hash)
+      if (el) scrollToTarget(el)
+    })
   } else if (!samePage) {
-    window.scrollTo({ top: 0 })
+    scrollToTarget(0, { immediate: true })
   }
 }
 

@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, type ComponentType } from 'react'
 import { usePath } from '@/lib/router'
+import { scrollToTarget } from '@/lib/smooth-scroll'
 import { HomePage } from '@/pages/home'
 
 // Inner pages load on demand so the home page bundle stays small.
@@ -46,7 +47,8 @@ export default function App() {
 /** After a (possibly lazy) page mounts, land on the section named in the URL hash. */
 function HashScroll() {
   useEffect(() => {
-    if (window.location.hash) document.querySelector(window.location.hash)?.scrollIntoView()
+    const el = window.location.hash && document.querySelector(window.location.hash)
+    if (el) scrollToTarget(el, { immediate: true })
   }, [])
   return null
 }

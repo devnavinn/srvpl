@@ -75,10 +75,15 @@ function Ecosystem() {
       <motion.div
         className="absolute grid -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-blue-200/70 p-3"
         style={{ left: `${(CENTER.x / 700) * 100}%`, top: `${(CENTER.y / 360) * 100}%` }}
-        animate={{ boxShadow: ['0 0 0 0 rgb(51 85 184 / .25)', '0 0 0 22px rgb(51 85 184 / 0)'] }}
-        transition={{ duration: 2, repeat: Infinity }}
       >
-        <span className="grid size-14 place-items-center rounded-full bg-white sm:size-[70px]">
+        {/* expanding ring: animates on the compositor (scale/opacity), no repaints */}
+        <motion.span
+          aria-hidden
+          className="absolute inset-0 rounded-full bg-brand/25"
+          animate={{ scale: [1, 1.45], opacity: [1, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
+        />
+        <span className="relative grid size-14 place-items-center rounded-full bg-white sm:size-[70px]">
           <LogoMark className="h-6 w-9 sm:h-8 sm:w-12" />
         </span>
       </motion.div>

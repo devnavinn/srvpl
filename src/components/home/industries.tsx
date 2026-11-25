@@ -3,6 +3,7 @@ import {
   motion,
   useAnimationFrame,
   useMotionValue,
+  useInView,
   useScroll,
   useSpring,
   useTransform,
@@ -31,9 +32,11 @@ function IndustrySlider({ baseVelocity = -2.5 }: { baseVelocity?: number }) {
   const x = useTransform(baseX, (v) => `${wrap(-100 / COPIES, 0, v)}%`)
   const direction = useRef(1)
   const [paused, setPaused] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { margin: '100px' })
 
   useAnimationFrame((_, delta) => {
-    if (paused) return
+    if (paused || !inView) return
     let moveBy = direction.current * baseVelocity * (delta / 1000)
     const f = velocityFactor.get()
     if (f < 0) direction.current = -1
@@ -46,6 +49,7 @@ function IndustrySlider({ baseVelocity = -2.5 }: { baseVelocity?: number }) {
 
   return (
     <div
+      ref={ref}
       className="relative overflow-hidden py-6 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}

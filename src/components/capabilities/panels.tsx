@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion, useInView } from 'motion/react'
 import { ArrowUp } from 'lucide-react'
 import { Reveal } from '@/components/home/shared'
 import { cn } from '@/lib/utils'
@@ -23,15 +23,28 @@ function DiamondCheck() {
 export function CapabilityPanels() {
   const [active, setActive] = useState(0)
   const [paused, setPaused] = useState(false)
+  const ref = useRef<HTMLElement>(null)
+  const inView = useInView(ref, { amount: 0.4 })
+  // Only cycle on wide screens while the row is on screen: switching columns reflows the
+  // layout, which would stutter page scrolling elsewhere (and make content jump on phones).
+  const [wide, setWide] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const update = () => setWide(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+  const autoplay = !paused && inView && wide
 
   useEffect(() => {
-    if (paused) return
+    if (!autoplay) return
     const id = setInterval(() => setActive((a) => (a + 1) % capabilities.length), 4000)
     return () => clearInterval(id)
-  }, [paused])
+  }, [autoplay])
 
   return (
-    <section id="capabilities-list" className="relative overflow-hidden bg-white px-4 py-24 sm:px-6 sm:py-44">
+    <section ref={ref} id="capabilities-list" className="relative overflow-hidden bg-white px-4 py-24 sm:px-6 sm:py-44">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_100%_100%,rgb(51_85_184/0.28),transparent_70%),radial-gradient(ellipse_50%_45%_at_25%_20%,rgb(51_85_184/0.08),transparent_70%)]" />
       <div className="bg-grid-light pointer-events-none absolute top-0 left-0 h-56 w-72 [mask-image:radial-gradient(circle_at_top_left,black,transparent_70%)]" />
       <div className="bg-grid-light pointer-events-none absolute top-0 right-0 h-56 w-72 [mask-image:radial-gradient(circle_at_top_right,black,transparent_70%)]" />
@@ -54,7 +67,7 @@ export function CapabilityPanels() {
                 aria-expanded={isActive}
                 style={{ flexGrow: isActive ? 2.4 : 1 }}
                 className={cn(
-                  'relative flex min-w-0 flex-col lg:basis-0 overflow-hidden rounded-md p-4 text-left outline-none',
+                  'relative flex min-w-0 flex-col overflow-hidden [contain:layout_paint] lg:basis-0 rounded-md p-4 text-left outline-none',
                   'transition-[flex-grow,background-color,box-shadow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
                   isActive
                     ? 'bg-[#d6dffa] shadow-[0_20px_50px_-30px_rgb(51_85_184/0.6)]'
@@ -69,15 +82,14 @@ export function CapabilityPanels() {
                   {String(i + 1).padStart(2, '0')}
                 </span>
 
-                <motion.span
-                  layout="position"
+                <span
                   className={cn(
                     'mt-6 block text-lg leading-tight text-ink transition-[font-weight] lg:mt-7',
                     isActive ? 'max-w-[260px] text-[22px] font-semibold tracking-tight' : 'max-w-[150px]',
                   )}
                 >
                   {c.title}
-                </motion.span>
+                </span>
 
                 <AnimatePresence initial={false}>
                   {isActive && (
@@ -122,7 +134,7 @@ export function CapabilityPanels() {
                 </span>
 
                 {/* autoplay progress */}
-                {isActive && !paused && (
+                {isActive && autoplay && (
                   <motion.span
                     key={`p-${active}`}
                     initial={{ scaleX: 0 }}

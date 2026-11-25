@@ -45,9 +45,9 @@ export function Marketplace() {
                 >
                   <span className="relative flex gap-6 pl-7">
                     <motion.span
-                      className="absolute top-0 left-0 w-1 bg-brand"
+                      className="absolute inset-y-0 left-0 w-1 origin-top bg-brand"
                       initial={false}
-                      animate={{ height: isOpen ? '100%' : '0%' }}
+                      animate={{ scaleY: isOpen ? 1 : 0 }}
                       transition={{ duration: 0.4 }}
                     />
                     <span className="pt-1 text-ink/70">{String(i + 1).padStart(2, '0')}</span>

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { motion } from 'motion/react'
+import { useLayoutEffect, useRef, useState } from 'react'
+import { motion, useScroll, useTransform, type MotionValue } from 'motion/react'
 import { Eyebrow, Reveal } from '@/components/home/shared'
 import { cn } from '@/lib/utils'
 import { values } from './data'
@@ -39,119 +39,144 @@ function DotChevrons({ className, flip }: { className?: string; flip?: boolean }
   )
 }
 
-const CARD = 310
-const PEEK = 94
+const GAP = 16
+const N = values.length
 
-export function CoreValues() {
-  const [active, setActive] = useState(0)
-  const [paused, setPaused] = useState(false)
+/**
+ * Pinned while scrolling (desktop). Phase 1: the cards start stacked like a deck
+ * on the left and fan out into a row. Phase 2: a blue progress line fills under
+ * each card in turn. Same choreography as zarion.webflow.io/about "built around control".
+ */
+function PinnedValues() {
+  const section = useRef<HTMLElement>(null)
+  const row = useRef<HTMLDivElement>(null)
+  const [width, setWidth] = useState(1200)
+  const { scrollYProgress: p } = useScroll({ target: section, offset: ['start start', 'end end'] })
 
-  useEffect(() => {
-    if (paused) return
-    const id = setInterval(() => setActive((a) => (a + 1) % values.length), 3500)
-    return () => clearInterval(id)
-  }, [paused])
+  useLayoutEffect(() => {
+    const el = row.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setWidth(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  const cardW = (width - GAP * (N - 1)) / N
+  const chevronsIn = useTransform(p, [0, 0.15], [0, 1])
 
   return (
-    <section className="relative overflow-hidden bg-white px-4 py-24 sm:px-6 sm:py-32">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_55%_at_60%_60%,rgb(51_85_184/0.13),transparent_70%)]" />
+    <section ref={section} className="relative hidden h-[300vh] bg-white lg:block">
+      <div className="sticky top-0 flex h-screen items-center overflow-hidden px-6">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_55%_at_60%_60%,rgb(51_85_184/0.13),transparent_70%)]" />
 
-      <div className="relative mx-auto max-w-[1312px]">
-        <div className="relative flex items-center justify-center">
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.9, ease: 'easeOut' }}
-            className="absolute left-[6%] hidden lg:block"
-          >
-            <DotChevrons className="w-[270px]" />
-          </motion.div>
-          <Reveal className="text-center">
-            <Eyebrow className="justify-center text-ink">Core Values</Eyebrow>
-            <h2 className="mt-3 text-3xl leading-[1.3] font-medium tracking-tight text-ink sm:text-[40px]">
-              The Values That
-              <br />
-              Drive Us
-            </h2>
-          </Reveal>
-          <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.9, ease: 'easeOut' }}
-            className="absolute right-[6%] hidden lg:block"
-          >
-            <DotChevrons className="w-[270px]" flip />
-          </motion.div>
-        </div>
-
-        {/* Desktop: overlapping deck; the active card rises to the top. */}
-        <Reveal y={30} className="mt-24 hidden sm:block">
-          <div
-            className="relative h-[307px]"
-            style={{ width: CARD + PEEK * (values.length - 1) }}
-            onMouseLeave={() => setPaused(false)}
-          >
-            {values.map((v, i) => {
-              const isActive = i === active
-              return (
-                <motion.button
-                  key={v.title}
-                  type="button"
-                  onMouseEnter={() => {
-                    setPaused(true)
-                    setActive(i)
-                  }}
-                  onFocus={() => setActive(i)}
-                  onClick={() => setActive(i)}
-                  animate={{ y: isActive ? -8 : 0 }}
-                  transition={{ type: 'spring', stiffness: 260, damping: 26 }}
-                  className="absolute top-0 flex h-full flex-col overflow-hidden rounded-2xl bg-white text-left shadow-[-18px_0_40px_-12px_rgb(15_23_42/0.18)] outline-none"
-                  style={{ left: i * PEEK, width: CARD, zIndex: 10 - Math.abs(i - active) }}
-                  aria-pressed={isActive}
-                >
-                  <ValueCardBody index={i} active={isActive} />
-                </motion.button>
-              )
-            })}
-          </div>
-        </Reveal>
-
-        {/* Mobile: simple stack */}
-        <div className="mt-14 grid gap-4 sm:hidden">
-          {values.map((v, i) => (
-            <Reveal key={v.title} delay={i * 0.05} className="overflow-hidden rounded-2xl bg-white shadow-md">
-              <ValueCardBody index={i} active />
+        <div className="relative mx-auto w-full max-w-[1312px]">
+          <div className="relative flex items-center justify-center">
+            <motion.div style={{ opacity: chevronsIn }} className="absolute left-[6%]">
+              <DotChevrons className="w-[220px]" />
+            </motion.div>
+            <Reveal className="text-center">
+              <Eyebrow className="justify-center text-ink">Core Values</Eyebrow>
+              <h2 className="mt-3 text-[40px] leading-[1.3] font-medium tracking-tight text-ink">
+                The Values That
+                <br />
+                Drive Us
+              </h2>
             </Reveal>
-          ))}
+            <motion.div style={{ opacity: chevronsIn }} className="absolute right-[6%]">
+              <DotChevrons className="w-[220px]" flip />
+            </motion.div>
+          </div>
+
+          <div ref={row} className="relative mt-16 h-[307px]">
+            {values.map((_, i) => (
+              <DeckCard key={i} index={i} p={p} cardW={cardW} />
+            ))}
+          </div>
         </div>
       </div>
     </section>
   )
 }
 
-function ValueCardBody({ index, active }: { index: number; active: boolean }) {
+function DeckCard({ index, p, cardW }: { index: number; p: MotionValue<number>; cardW: number }) {
+  // Phase 1 (0.08 → 0.42): from a fanned stack to the final column.
+  const stackX = index * 52
+  const finalX = index * (cardW + GAP)
+  const x = useTransform(p, [0.08, 0.42], [stackX, finalX])
+  const scale = useTransform(p, [0.08, 0.42], [1 - index * 0.05, 1])
+  const y = useTransform(p, [0.08, 0.42], [index * 8, 0])
+  // Phase 2 (0.48 → 0.92): each card's line fills one after another.
+  const slot = 0.44 / N
+  const start = 0.48 + index * slot
+  const fill = useTransform(p, [start, start + slot], [0, 1])
+
+  return (
+    <motion.div
+      style={{ x, y, scale, width: cardW, zIndex: N - index }}
+      className="absolute top-0 left-0 flex h-full origin-left flex-col overflow-hidden rounded-2xl bg-white shadow-[0_18px_40px_-22px_rgb(15_23_42/0.35)] will-change-transform"
+    >
+      <ValueCardBody index={index} fill={fill} />
+    </motion.div>
+  )
+}
+
+/** Mobile / tablet: plain grid; each line fills as its card scrolls into view. */
+function StackedValues() {
+  return (
+    <section className="relative overflow-hidden bg-white px-4 py-20 sm:px-6 lg:hidden">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_60%_60%,rgb(51_85_184/0.12),transparent_70%)]" />
+      <Reveal className="relative text-center">
+        <Eyebrow className="justify-center text-ink">Core Values</Eyebrow>
+        <h2 className="mt-3 text-3xl leading-[1.3] font-medium tracking-tight text-ink sm:text-[40px]">
+          The Values That Drive Us
+        </h2>
+      </Reveal>
+      <div className="relative mt-12 grid gap-4 sm:grid-cols-2">
+        {values.map((_, i) => (
+          <MobileValueCard key={i} index={i} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function MobileValueCard({ index }: { index: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 90%', 'start 45%'] })
+  const y = useTransform(scrollYProgress, [0, 0.6], [40, 0])
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [0, 1])
+  return (
+    <motion.div ref={ref} style={{ y, opacity }} className="flex min-h-[280px] flex-col overflow-hidden rounded-2xl bg-white shadow-md">
+      <ValueCardBody index={index} fill={scrollYProgress} />
+    </motion.div>
+  )
+}
+
+function ValueCardBody({ index, fill }: { index: number; fill: MotionValue<number> }) {
   const v = values[index]
   const Icon = v.icon
   return (
     <>
-      <div className="flex flex-1 flex-col px-9 pt-9">
+      <div className="flex flex-1 flex-col px-7 pt-7">
         <div className="flex items-start justify-between">
-          <span className="text-lg text-ink/70">/{String(index + 1).padStart(3, '0')}</span>
+          <span className="font-mono text-base tracking-widest text-ink/70">{String(index + 1).padStart(3, '0')}</span>
           <Icon className="size-11 text-brand" strokeWidth={1.25} />
         </div>
         <h3 className="mt-auto pb-6 text-xl font-semibold tracking-tight text-ink">{v.title}</h3>
       </div>
       <div className="relative h-1 bg-neutral-200">
-        <motion.div
-          className="absolute inset-y-0 left-0 bg-brand"
-          initial={false}
-          animate={{ width: active ? '100%' : '0%' }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-        />
+        <motion.div style={{ scaleX: fill }} className="absolute inset-0 origin-left bg-brand" />
       </div>
-      <p className="h-[102px] max-w-[240px] px-9 pt-8 text-[15px] leading-snug text-ink/70">{v.body}</p>
+      <p className="min-h-[102px] px-7 pt-7 pb-6 text-[15px] leading-snug text-ink/70">{v.body}</p>
+    </>
+  )
+}
+
+export function CoreValues() {
+  return (
+    <>
+      <PinnedValues />
+      <StackedValues />
     </>
   )
 }

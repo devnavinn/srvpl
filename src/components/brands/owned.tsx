@@ -112,7 +112,7 @@ export function OwnedBrands() {
                 onClick={() => setActive(i)}
                 style={{ flexGrow: on ? 4.5 : 1 }}
                 className={cn(
-                  'relative min-w-0 basis-0 cursor-pointer overflow-hidden rounded-lg border border-dashed outline-none',
+                  'relative min-w-0 basis-0 cursor-pointer overflow-hidden rounded-lg border border-dashed outline-none [contain:layout_paint]',
                   'transition-[flex-grow,background-color,border-color] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
                   on ? 'border-ink/15 bg-white' : 'border-ink/10 bg-white hover:border-ink/25',
                 )}

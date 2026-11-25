@@ -47,7 +47,7 @@ export function BrandPortfolio() {
           </h2>
         </Reveal>
 
-        <div className="mt-12 border border-dashed border-ink/15 bg-white/70 backdrop-blur-sm">
+        <div className="mt-12 border border-dashed border-ink/15 bg-white/85">
           <div className="grid md:grid-cols-2">
             {brandsTop.map((b, i) => (
               <BrandCell

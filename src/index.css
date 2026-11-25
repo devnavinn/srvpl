@@ -184,4 +184,20 @@
   .no-scrollbar::-webkit-scrollbar { display: none; }
 }
 
-html { scroll-behavior: smooth; }
+/* Smooth scrolling is handled by Lenis (src/lib/smooth-scroll.ts); native smooth would fight it. */
+html:not(.lenis) { scroll-behavior: smooth; }
+
+/* Hero wave lines: each path drifts one wave period (400 units) and loops seamlessly. */
+@keyframes wave-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-400px); }
+}
+.wave-line {
+  animation: wave-drift linear infinite;
+  will-change: transform;
+}
+/* Off-screen hero: stop the waves so they cost nothing while you read the page. */
+[data-paused] .wave-line { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .wave-line { animation: none; }
+}
