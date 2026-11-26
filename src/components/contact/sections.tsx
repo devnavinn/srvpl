@@ -51,7 +51,7 @@ export function ContactIntro() {
           </dl>
 
           <p className="mt-14 text-[15px] text-ink/60">Looking for your next role?</p>
-          <a href="/#careers" onClick={onLinkClick} className="mt-1.5 inline-flex items-center gap-1 text-[15px] text-brand hover:underline">
+          <a href="/careers" onClick={onLinkClick} className="mt-1.5 inline-flex items-center gap-1 text-[15px] text-brand hover:underline">
             Explore careers at SRVPL <ArrowUpRight className="size-4" />
           </a>
         </Reveal>

@@ -176,10 +176,10 @@ export function ContactForm() {
   )
 }
 
-const inputCls =
+export const inputCls =
   'w-full rounded-sm border border-transparent bg-white px-4 py-3.5 text-sm text-ink outline-none transition-colors placeholder:text-ink/45 focus:border-brand/50 focus:ring-3 focus:ring-brand/15 aria-[invalid=true]:border-red-400'
 
-function Field({
+export function Field({
   label,
   required,
   error,

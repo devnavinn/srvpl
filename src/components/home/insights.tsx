@@ -1,75 +1,30 @@
-import { useRef } from 'react'
-import { motion } from 'motion/react'
 import { ArrowRight } from 'lucide-react'
-import { ArrowButton, Eyebrow, Reveal } from './shared'
-import { author, insights } from './data'
+import { ArrowButton, Reveal } from './shared'
 import { onLinkClick } from '@/lib/router'
-import { article } from '@/components/insights/data'
+import { articles } from '@/components/insights/data'
+import { ArticleRail } from '@/components/insights/card'
 
 export function Insights() {
-  const track = useRef<HTMLDivElement>(null)
-  const scrollBy = () => track.current?.scrollBy({ left: 452, behavior: 'smooth' })
-
   return (
-    <section id="insights" className="bg-white py-24 sm:py-32">
-      <div className="mx-auto flex max-w-[1312px] flex-col gap-6 px-4 sm:flex-row sm:items-end sm:justify-between sm:px-6">
-        <Reveal>
-          <Eyebrow className="text-ink">Insights</Eyebrow>
-          <h2 className="mt-3 text-3xl font-medium tracking-tight text-ink/85 sm:text-[40px]">Latest Industry Insights</h2>
-        </Reveal>
-        <button
-          onClick={scrollBy}
+    <ArticleRail
+      id="insights"
+      eyebrow="Insights"
+      title="Latest Industry Insights"
+      posts={articles}
+      className="py-24 sm:py-32"
+      action={
+        <a
+          href="/insights"
+          onClick={onLinkClick}
           className="group flex items-center gap-3 self-start border border-ink/15 py-1 pr-1 pl-4 text-[15px] text-ink sm:self-auto"
         >
           See all articles
           <span className="grid size-8 place-items-center bg-ink/10 transition-colors group-hover:bg-ink group-hover:text-white">
             <ArrowRight className="size-4" />
           </span>
-        </button>
-      </div>
-
-      <div
-        ref={track}
-        className="no-scrollbar mt-14 flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pr-4 sm:pr-6"
-        // Align the first card with the heading's container, while letting cards bleed off the right edge
-        style={{ paddingLeft: 'max(1rem, calc((100vw - 1312px) / 2 + 1.5rem))', scrollPaddingLeft: 'max(1rem, calc((100vw - 1312px) / 2 + 1.5rem))' }}
-      >
-        {insights.map((post, i) => (
-          <motion.article
-            key={i}
-            initial={{ opacity: 0, x: 60 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.1, duration: 0.6 }}
-            className="group w-[85vw] max-w-[428px] shrink-0 snap-start"
-          >
-            <a href={article.slug} onClick={onLinkClick}>
-              <div className="overflow-hidden">
-                <img
-                  src={post.src}
-                  alt=""
-                  className="aspect-[428/259] w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
-              <div className="mt-4 flex items-center gap-3 text-sm">
-                <span className="border border-ink/10 bg-ink/[0.03] px-2 py-0.5 text-xs uppercase">{post.tag}</span>
-                <span className="text-ink/60 uppercase">{post.date}</span>
-              </div>
-              <h3 className="mt-4 text-xl leading-snug font-medium text-ink/90 underline-offset-4 group-hover:underline sm:text-2xl">
-                {post.title}
-              </h3>
-              <div className="mt-6 flex items-center gap-3">
-                <span className="grid size-8 place-items-center bg-ink text-xs font-semibold text-white">JS</span>
-                <div className="text-sm leading-tight">
-                  <p className="font-medium text-ink">{author.name}</p>
-                  <p className="text-xs text-ink/60">{author.role}</p>
-                </div>
-              </div>
-            </a>
-          </motion.article>
-        ))}
-      </div>
-    </section>
+        </a>
+      }
+    />
   )
 }
 

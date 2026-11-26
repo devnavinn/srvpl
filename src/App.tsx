@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, type ComponentType } from 'react'
 import { usePath } from '@/lib/router'
 import { scrollToTarget } from '@/lib/smooth-scroll'
 import { HomePage } from '@/pages/home'
-import { article } from '@/components/insights/data'
+import { findArticle } from '@/components/insights/data'
 
 // Inner pages load on demand so the home page bundle stays small.
 const page = (load: () => Promise<Record<string, ComponentType>>, name: string) =>
@@ -24,16 +24,27 @@ const routes: Record<string, { page: ComponentType; title: string }> = {
     page: page(() => import('@/pages/industries'), 'IndustriesPage'),
     title: 'Industries — Smith Retail Ventures',
   },
-  '/contact': { page: page(() => import('@/pages/contact'), 'ContactPage'), title: 'Contact Us — Smith Retail Ventures' },
-  [article.slug]: {
-    page: page(() => import('@/pages/insight'), 'InsightPage'),
-    title: `${article.title.join(' ')} — Smith Retail Ventures`,
+  '/insights': {
+    page: page(() => import('@/pages/insights'), 'InsightsPage'),
+    title: 'Insights — Smith Retail Ventures',
   },
+  '/careers': { page: page(() => import('@/pages/careers'), 'CareersPage'), title: 'Careers — Smith Retail Ventures' },
+  '/contact': { page: page(() => import('@/pages/contact'), 'ContactPage'), title: 'Contact Us — Smith Retail Ventures' },
+}
+
+const insightPage = page(() => import('@/pages/insight'), 'InsightPage')
+
+function resolve(path: string) {
+  if (routes[path]) return routes[path]
+  const article = findArticle(path)
+  if (article) return { page: insightPage, title: `${article.title.join(' ')} — Smith Retail Ventures` }
+  if (path.startsWith('/insights/')) return routes['/insights']
+  return routes['/']
 }
 
 export default function App() {
   const path = usePath()
-  const route = routes[path] ?? routes['/']
+  const route = resolve(path)
 
   useEffect(() => {
     document.title = route.title

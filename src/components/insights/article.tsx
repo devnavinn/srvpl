@@ -1,24 +1,24 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
 import { ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react'
 import { Header } from '@/components/home/hero'
-import { Eyebrow, Reveal } from '@/components/home/shared'
+import { Reveal } from '@/components/home/shared'
 import { onLinkClick } from '@/lib/router'
 import { cn } from '@/lib/utils'
-import { article, relatedPosts } from './data'
+import { articles, type Article } from './data'
+import { ArticleRail } from './card'
 
 const EASE = [0.22, 1, 0.36, 1] as const
-const sectionIds = article.sections.map((s) => s.id)
 
 /** Plain dark hero for articles: breadcrumb row, two-line title, one-line standfirst. */
-export function ArticleHero() {
+export function ArticleHero({ article }: { article: Article }) {
   return (
     <section className="relative bg-[#161616] px-4 text-white sm:px-6">
       <Header />
       <div className="relative z-10 mx-auto max-w-[1312px] pt-20 pb-16 sm:pt-16 sm:pb-20">
         <div className="flex items-center justify-between border-t border-white/15 pt-6 text-sm">
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-            <a href="/#insights" onClick={onLinkClick} className="hover:underline">
+            <a href="/insights" onClick={onLinkClick} className="hover:underline">
               Insights
             </a>{' '}
             / <span className="text-white/90">{article.category}</span>
@@ -59,10 +59,11 @@ export function ArticleHero() {
 }
 
 /** Cover image over a faint grid, then a sticky contents list beside the article body. */
-export function ArticleBody() {
+export function ArticleBody({ article }: { article: Article }) {
   const ref = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'start start'] })
   const imgScale = useTransform(scrollYProgress, [0, 1], [1.12, 1])
+  const sectionIds = useMemo(() => article.sections.map((s) => s.id), [article])
   const active = useActiveSection(sectionIds)
 
   return (
@@ -75,7 +76,7 @@ export function ArticleBody() {
           <div className="overflow-hidden rounded-md">
             <motion.img
               src={article.image}
-              alt="A strategist walks his team through a wall of priorities"
+              alt=""
               style={{ scale: imgScale }}
               className="aspect-[4/3] w-full object-cover sm:aspect-[1312/500]"
             />
@@ -149,18 +150,18 @@ function useActiveSection(ids: string[]) {
   return active
 }
 
-export function KeepReading() {
+export function KeepReading({ current }: { current: Article }) {
   const track = useRef<HTMLDivElement>(null)
   const scroll = (dir: 1 | -1) => track.current?.scrollBy({ left: dir * 430, behavior: 'smooth' })
-  const gutter = 'max(1rem, calc((100vw - 1312px) / 2 + 1.5rem))'
 
   return (
-    <section className="bg-white pt-8 pb-20 sm:pb-24">
-      <div className="mx-auto flex max-w-[1312px] items-end justify-between gap-6 px-4 sm:px-6">
-        <Reveal>
-          <Eyebrow className="text-xs text-ink">Keep reading</Eyebrow>
-          <h2 className="mt-3 text-3xl font-medium tracking-tight text-ink/90 sm:text-[40px]">Keep Reading</h2>
-        </Reveal>
+    <ArticleRail
+      eyebrow="Keep reading"
+      title="Keep Reading"
+      posts={articles.filter((a) => a !== current)}
+      trackRef={track}
+      className="pt-8 pb-20 sm:pb-24"
+      action={
         <div className="flex gap-2">
           {([-1, 1] as const).map((d) => (
             <button
@@ -173,40 +174,7 @@ export function KeepReading() {
             </button>
           ))}
         </div>
-      </div>
-
-      <div
-        ref={track}
-        className="no-scrollbar mt-10 flex snap-x snap-mandatory gap-8 overflow-x-auto scroll-smooth pr-4 sm:pr-6"
-        style={{ paddingLeft: gutter, scrollPaddingLeft: gutter }}
-      >
-        {relatedPosts.map((post, i) => (
-          <motion.article
-            key={post.title}
-            initial={{ opacity: 0, x: 60 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.1, duration: 0.6 }}
-            className="group w-[80vw] max-w-[408px] shrink-0 snap-start"
-          >
-            <a href={article.slug} onClick={onLinkClick}>
-              <div className="overflow-hidden rounded-md">
-                <img
-                  src={post.src}
-                  alt=""
-                  className="aspect-[408/306] w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
-              <p className="mt-6 font-mono text-[11px] tracking-wider text-ink/60 uppercase">
-                {post.kind} · {post.read} · {post.date}
-              </p>
-              <h3 className="mt-4 max-w-[300px] text-lg leading-snug font-medium text-ink underline-offset-4 group-hover:underline">
-                {post.title}
-              </h3>
-            </a>
-          </motion.article>
-        ))}
-      </div>
-    </section>
+      }
+    />
   )
 }

@@ -5,8 +5,8 @@ export const navLinks = [
   { label: 'Capabilities', href: '/capabilities' },
   { label: 'Industries', href: '/industries' },
   { label: 'Our Brands', href: '/brands' },
-  { label: 'Insights', href: '/#insights' },
-  { label: 'Careers', href: '/#careers' },
+  { label: 'Insights', href: '/insights' },
+  { label: 'Careers', href: '/careers' },
 ]
 
 export const partners = [
@@ -62,32 +62,3 @@ export const brands = [
   { name: 'MOFT', src: '/home/brands/moft.png' },
   { name: 'stanz.', src: '/home/brands/stanz.png' },
 ]
-
-export const insights = [
-  {
-    tag: 'SaaS',
-    date: 'July 24, 2026',
-    title: 'How to plan a B2B SaaS website migration in 2026',
-    src: '/home/insights/b2b-saas-migration.png',
-  },
-  {
-    tag: 'SaaS',
-    date: 'July 24, 2026',
-    title: '20 High-Converting SaaS Website Pages: Actionable Tips for Marketers',
-    src: '/home/insights/saas-website-pages.png',
-  },
-  {
-    tag: 'SaaS',
-    date: 'July 24, 2026',
-    title: 'How to plan a B2B SaaS website migration in 2026',
-    src: '/home/insights/b2b-saas-migration.png',
-  },
-  {
-    tag: 'SaaS',
-    date: 'July 24, 2026',
-    title: '20 High-Converting SaaS Website Pages: Actionable Tips for Marketers',
-    src: '/home/insights/saas-website-pages.png',
-  },
-]
-
-export const author = { name: 'Jakub Startek', role: 'CEO & Growth Advisor' }

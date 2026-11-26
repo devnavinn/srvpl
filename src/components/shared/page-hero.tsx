@@ -12,6 +12,7 @@ export function PageHero({
   next,
   introPosition = 'bottom',
   partners = true,
+  bottom,
 }: {
   label: string
   /** Each line with its colour; typically brand / white / brand. */
@@ -19,10 +20,12 @@ export function PageHero({
   intro: ReactNode
   /** id of the section "Scroll to discover" jumps to */
   next: string
-  /** top/bottom: beside the headline on desktop; below: under it, left-aligned */
-  introPosition?: 'top' | 'bottom' | 'below'
+  /** top/bottom: beside the headline on desktop; below: under it, left-aligned; under-right: under it, right-aligned */
+  introPosition?: 'top' | 'bottom' | 'below' | 'under-right'
   /** show the marketplace partner strip under the hero */
   partners?: boolean
+  /** replaces the partner strip, e.g. filter pills */
+  bottom?: ReactNode
 }) {
   const { scrollY } = useScroll()
   const bgY = useTransform(scrollY, [0, 800], [0, 200])
@@ -52,7 +55,7 @@ export function PageHero({
         <div
           className={cn(
             'mt-6 flex flex-col gap-10 pb-16 sm:pb-24',
-            introPosition !== 'below' && 'lg:flex-row lg:justify-between',
+            introPosition !== 'below' && introPosition !== 'under-right' && 'lg:flex-row lg:justify-between',
             introPosition === 'bottom' && 'lg:items-end',
             introPosition === 'top' && 'lg:items-start',
           )}
@@ -60,7 +63,7 @@ export function PageHero({
           <h1
             className={cn(
               'text-[clamp(2.5rem,5.2vw,4.25rem)] leading-[1.12] font-semibold tracking-tight',
-              introPosition === 'below' && 'w-full',
+              (introPosition === 'below' || introPosition === 'under-right') && 'w-full',
             )}
           >
             {lines.map((line, i) => (
@@ -82,7 +85,8 @@ export function PageHero({
             transition={{ delay: 0.9 }}
             className={cn(
               'text-[15px] leading-snug font-medium text-white/90',
-              introPosition === 'below' ? 'max-w-[500px] lg:-mt-14' : 'max-w-[412px]',
+              introPosition === 'below' ? 'max-w-[500px] lg:-mt-14' : introPosition === 'under-right' ? 'max-w-[470px]' : 'max-w-[412px]',
+              introPosition === 'under-right' && 'text-sm lg:-mt-4 lg:ml-auto',
               introPosition === 'bottom' && 'lg:mb-3',
               introPosition === 'top' && 'lg:mt-6',
             )}
@@ -92,7 +96,7 @@ export function PageHero({
         </div>
       </div>
 
-      {partners && <PartnerStrip delay={1} />}
+      {bottom ?? (partners && <PartnerStrip delay={1} />)}
     </section>
   )
 }

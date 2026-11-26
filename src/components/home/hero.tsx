@@ -60,6 +60,9 @@ export function WaveBackground() {
   )
 }
 
+/** A nav link is current on its own page and on any page below it (e.g. /insights/<slug>). */
+const isCurrent = (path: string, href: string) => path === href || (href !== '/' && path.startsWith(`${href}/`))
+
 export function Header() {
   const [open, setOpen] = useState(false)
   const path = usePath()
@@ -77,10 +80,10 @@ export function Header() {
             key={l.label}
             href={l.href}
             onClick={onLinkClick}
-            aria-current={path === l.href ? 'page' : undefined}
+            aria-current={isCurrent(path, l.href) ? 'page' : undefined}
             className={cn(
               'underline-offset-4 transition-colors hover:text-white hover:underline',
-              path === l.href && 'text-white underline',
+              isCurrent(path, l.href) && 'text-white underline',
             )}
           >
             {l.label}
