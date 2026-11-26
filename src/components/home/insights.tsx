@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import { ArrowButton, Eyebrow, Reveal } from './shared'
 import { author, insights } from './data'
 import { onLinkClick } from '@/lib/router'
+import { article } from '@/components/insights/data'
 
 export function Insights() {
   const track = useRef<HTMLDivElement>(null)
@@ -42,7 +43,7 @@ export function Insights() {
             transition={{ delay: i * 0.1, duration: 0.6 }}
             className="group w-[85vw] max-w-[428px] shrink-0 snap-start"
           >
-            <a href="#">
+            <a href={article.slug} onClick={onLinkClick}>
               <div className="overflow-hidden">
                 <img
                   src={post.src}

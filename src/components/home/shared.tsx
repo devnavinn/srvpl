@@ -68,7 +68,7 @@ export function LogoMark({ className }: { className?: string }) {
 export function ArrowButton({
   children,
   variant = 'dark',
-  href = '#contact',
+  href = '/contact',
   className,
 }: {
   children: ReactNode

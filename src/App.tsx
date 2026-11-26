@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, type ComponentType } from 'react'
 import { usePath } from '@/lib/router'
 import { scrollToTarget } from '@/lib/smooth-scroll'
 import { HomePage } from '@/pages/home'
+import { article } from '@/components/insights/data'
 
 // Inner pages load on demand so the home page bundle stays small.
 const page = (load: () => Promise<Record<string, ComponentType>>, name: string) =>
@@ -22,6 +23,11 @@ const routes: Record<string, { page: ComponentType; title: string }> = {
   '/industries': {
     page: page(() => import('@/pages/industries'), 'IndustriesPage'),
     title: 'Industries — Smith Retail Ventures',
+  },
+  '/contact': { page: page(() => import('@/pages/contact'), 'ContactPage'), title: 'Contact Us — Smith Retail Ventures' },
+  [article.slug]: {
+    page: page(() => import('@/pages/insight'), 'InsightPage'),
+    title: `${article.title.join(' ')} — Smith Retail Ventures`,
   },
 }
 

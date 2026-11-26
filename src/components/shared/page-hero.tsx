@@ -11,6 +11,7 @@ export function PageHero({
   intro,
   next,
   introPosition = 'bottom',
+  partners = true,
 }: {
   label: string
   /** Each line with its colour; typically brand / white / brand. */
@@ -20,6 +21,8 @@ export function PageHero({
   next: string
   /** top/bottom: beside the headline on desktop; below: under it, left-aligned */
   introPosition?: 'top' | 'bottom' | 'below'
+  /** show the marketplace partner strip under the hero */
+  partners?: boolean
 }) {
   const { scrollY } = useScroll()
   const bgY = useTransform(scrollY, [0, 800], [0, 200])
@@ -89,7 +92,7 @@ export function PageHero({
         </div>
       </div>
 
-      <PartnerStrip delay={1} />
+      {partners && <PartnerStrip delay={1} />}
     </section>
   )
 }

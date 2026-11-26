@@ -87,7 +87,7 @@ export function Header() {
           </a>
         ))}
       </nav>
-      <a href="#contact" onClick={onLinkClick} className="hidden items-center gap-1 border-b border-white pb-1 text-[15px] text-white lg:flex">
+      <a href="/contact" onClick={onLinkClick} className="hidden items-center gap-1 border-b border-white pb-1 text-[15px] text-white lg:flex">
         CONTACT <ArrowUpRight className="size-4" />
       </a>
       <button className="text-white lg:hidden" onClick={() => setOpen((o) => !o)} aria-label="Toggle menu">
@@ -101,7 +101,7 @@ export function Header() {
             exit={{ opacity: 0, y: -8 }}
             className="absolute inset-x-0 top-full mt-2 flex flex-col gap-3 rounded-2xl border border-white/15 bg-navy/95 p-6 text-white backdrop-blur-md lg:hidden"
           >
-            {[...navLinks, { label: 'Contact', href: '#contact' }].map((l) => (
+            {[...navLinks, { label: 'Contact', href: '/contact' }].map((l) => (
               <a
                 key={l.label}
                 href={l.href}
